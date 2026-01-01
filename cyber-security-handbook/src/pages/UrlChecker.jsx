@@ -145,19 +145,36 @@ const UrlChecker = () => {
           <Fade in timeout={800}>
             <Box>
               <Typography variant="h2" sx={{ 
-                fontWeight: 900, mb: 1, 
-                fontSize: { xs: '2rem', md: '3.5rem' },
-                letterSpacing: '-1px'
+                fontWeight: 900,
+                mb: 1, 
+                fontSize: { xs: '2.5rem', md: '4rem' },
+                letterSpacing: '-2px',
+                color: '#f1f5f9',
+                textShadow: '0 4px 20px rgba(0,0,0,0.3)'
               }}>
                 BẠN CÓ ĐANG LƯỚT
               </Typography>
               <Typography variant="h2" sx={{ 
-                fontWeight: 900, mb: 6, 
-                fontSize: { xs: '2rem', md: '3.5rem' },
-                background: 'linear-gradient(90deg, #10b981 0%, #3b82f6 100%)',
+                fontWeight: 900,
+                mb: 6, 
+                fontSize: { xs: '2.5rem', md: '4rem' },
+                background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 50%, #8b5cf6 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                letterSpacing: '-1px'
+                letterSpacing: '-2px',
+                position: 'relative',
+                display: 'inline-block',
+                '&::after': {
+                  content: '\"\"',
+                  position: 'absolute',
+                  bottom: -10,
+                  left: 0,
+                  right: 0,
+                  height: '6px',
+                  background: 'linear-gradient(90deg, #10b981, #06b6d4, #8b5cf6)',
+                  borderRadius: '3px',
+                  opacity: 0.6
+                }
               }}>
                 MẠNG AN TOÀN?
               </Typography>
@@ -166,17 +183,46 @@ const UrlChecker = () => {
 
           {/* Search Bar */}
           <Grow in timeout={1000}>
-            <Box sx={{ maxWidth: '700px', mx: 'auto', position: 'relative', mb: 3 }}>
-              <Paper component="form" sx={{ 
-                p: '4px', display: 'flex', alignItems: 'center', 
-                borderRadius: 3, border: '4px solid rgba(255,255,255,0.1)',
-                bgcolor: '#fff', boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-                transition: 'all 0.3s',
-                '&:focus-within': { borderColor: '#10b981', transform: 'scale(1.02)' }
+            <Box sx={{ maxWidth: '800px', mx: 'auto', position: 'relative', mb: 4 }}>
+              <Paper elevation={0} component="form" sx={{ 
+                p: '6px',
+                display: 'flex',
+                alignItems: 'center', 
+                borderRadius: 4,
+                border: '3px solid transparent',
+                background: 'linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, #10b981, #06b6d4, #8b5cf6) border-box',
+                boxShadow: '0 25px 60px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                position: 'relative',
+                '&:focus-within': { 
+                  transform: 'translateY(-4px) scale(1.01)',
+                  boxShadow: '0 30px 70px -10px rgba(16, 185, 129, 0.4), 0 0 0 4px rgba(16, 185, 129, 0.1)'
+                }
               }}>
+                <Box sx={{ 
+                  ml: 2,
+                  p: 1.5,
+                  borderRadius: 2,
+                  bgcolor: 'rgba(16, 185, 129, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <LanguageIcon sx={{ color: '#10b981', fontSize: 28 }} />
+                </Box>
                 <InputBase
-                  sx={{ ml: 2, flex: 1, fontSize: '1.1rem', color: '#334155', py: 1.5, fontWeight: 500 }}
-                  placeholder="Nhập đường dẫn hoặc IP hoặc tên miền để kiểm tra..."
+                  sx={{ 
+                    ml: 2, 
+                    flex: 1, 
+                    fontSize: '1.15rem', 
+                    color: '#1e293b', 
+                    py: 2,
+                    fontWeight: 600,
+                    '&::placeholder': {
+                      color: '#94a3b8',
+                      opacity: 1
+                    }
+                  }}
+                  placeholder="Nhập URL, tên miền hoặc địa chỉ IP để kiểm tra an toàn..."
                   value={url}
                   onChange={handleUrlChange}
                   onKeyPress={handleKeyPress}
@@ -187,68 +233,126 @@ const UrlChecker = () => {
                   onClick={handleCheck}
                   disabled={loading}
                   sx={{ 
-                    bgcolor: '#10b981', borderRadius: 2.5, minWidth: '60px', height: '54px',
-                    boxShadow: 'none',
-                    '&:hover': { bgcolor: '#059669' }
+                    background: loading 
+                      ? 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)'
+                      : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    borderRadius: 2.5,
+                    minWidth: '140px',
+                    height: '56px',
+                    mr: 0.5,
+                    boxShadow: '0 8px 20px -4px rgba(16, 185, 129, 0.5)',
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    transition: 'all 0.3s',
+                    '&:hover': { 
+                      background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 12px 28px -4px rgba(16, 185, 129, 0.6)'
+                    },
+                    '&:disabled': {
+                      background: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)'
+                    }
                   }}
                 >
-                  {loading ? <SearchIcon size={24} color="inherit" /> : <SearchIcon fontSize="large" />}
+                  {loading ? (
+                    <><CircularProgress size={24} sx={{ color: '#fff', mr: 1 }} /> Đang quét...</>
+                  ) : (
+                    <><SearchIcon sx={{ mr: 1 }} /> Kiểm tra</>
+                  )}
                 </Button>
               </Paper>
               {(urlError || error) && (
-                <Alert severity="error" sx={{ mt: 2, borderRadius: 2, bgcolor: 'rgba(239, 68, 68, 0.1)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                  {urlError || error}
-                </Alert>
+                <Fade in>
+                  <Alert 
+                    severity="error" 
+                    icon={<ErrorIcon />}
+                    sx={{ 
+                      mt: 3,
+                      borderRadius: 3,
+                      bgcolor: 'rgba(239, 68, 68, 0.1)',
+                      color: '#fca5a5',
+                      border: '2px solid rgba(239, 68, 68, 0.3)',
+                      backdropFilter: 'blur(10px)',
+                      fontWeight: 600,
+                      '& .MuiAlert-icon': {
+                        color: '#ef4444'
+                      }
+                    }}
+                  >
+                    {urlError || error}
+                  </Alert>
+                </Fade>
               )}
             </Box>
           </Grow>
 
           {/* Social Links */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mb: 6, color: '#94a3b8' }}>
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ cursor: 'pointer', '&:hover': { color: '#1877f2' } }}>
-               <FacebookIcon /> <Typography variant="body2">Facebook</Typography>
-            </Stack>
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ cursor: 'pointer', '&:hover': { color: '#1da1f2' } }}>
-               <TwitterIcon /> <Typography variant="body2">Twitter</Typography>
-            </Stack>
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ cursor: 'pointer', '&:hover': { color: '#ff0000' } }}>
-               <YouTubeIcon /> <Typography variant="body2">YouTube</Typography>
-            </Stack>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: 3, 
+            mb: 8,
+            flexWrap: 'wrap'
+          }}>
+            
           </Box>
 
           {/* Feature Buttons */}
-          <Grid container spacing={2} justifyContent="center" sx={{ maxWidth: '1000px', mx: 'auto' }}>
+          <Grid container spacing={2.5} justifyContent="center" sx={{ maxWidth: '1100px', mx: 'auto' }}>
             {actionButtons.map((btn, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>
-                <Button 
-                  fullWidth
-                  variant="contained"
-                  startIcon={btn.icon}
-                  onClick={() => navigate(btn.path)}
-                  sx={{ 
-                    bgcolor: 'rgba(30, 41, 59, 0.6)', 
-                    color: '#fff',
-                    py: 1.8, px: 2,
-                    borderRadius: 3,
-                    border: '1px solid rgba(255,255,255,0.05)',
-                    backdropFilter: 'blur(10px)',
-                    justifyContent: 'flex-start',
-                    textAlign: 'left',
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.9rem',
-                    transition: 'all 0.3s',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                    '&:hover': {
-                      bgcolor: btn.color,
-                      borderColor: btn.color,
-                      transform: 'translateY(-4px)',
-                      boxShadow: `0 10px 25px -5px ${btn.color}80`
-                    }
-                  }}
-                >
-                  {btn.label}
-                </Button>
+                <Fade in timeout={1200 + (index * 100)}>
+                  <Button 
+                    fullWidth
+                    variant="contained"
+                    startIcon={btn.icon}
+                    onClick={() => navigate(btn.path)}
+                    sx={{ 
+                      background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)',
+                      color: '#fff',
+                      py: 2.5,
+                      px: 3,
+                      borderRadius: 4,
+                      border: '2px solid rgba(255,255,255,0.1)',
+                      backdropFilter: 'blur(10px)',
+                      justifyContent: 'flex-start',
+                      textAlign: 'left',
+                      textTransform: 'none',
+                      fontWeight: 700,
+                      fontSize: '0.95rem',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: '0 4px 12px -2px rgba(0, 0, 0, 0.3)',
+                      '&::before': {
+                        content: '\"\"',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: `linear-gradient(135deg, ${btn.color}22 0%, ${btn.color}11 100%)`,
+                        opacity: 0,
+                        transition: 'opacity 0.3s'
+                      },
+                      '&:hover': {
+                        background: `linear-gradient(135deg, ${btn.color} 0%, ${btn.color}dd 100%)`,
+                        borderColor: btn.color,
+                        transform: 'translateY(-6px) scale(1.02)',
+                        boxShadow: `0 20px 40px -8px ${btn.color}60`,
+                        '&::before': {
+                          opacity: 1
+                        }
+                      },
+                      '& .MuiButton-startIcon': {
+                        marginRight: 1.5,
+                        fontSize: '1.5rem'
+                      }
+                    }}
+                  >
+                    {btn.label}
+                  </Button>
+                </Fade>
               </Grid>
             ))}
           </Grid>
@@ -259,64 +363,362 @@ const UrlChecker = () => {
       <Container maxWidth="md" sx={{ mb: resultsRef.current ? 8 : 0 }}>
         <Box ref={resultsRef}>
           {(result || blacklistResult) && (
-            <Grow in>
-              <Paper sx={{ 
-                p: { xs: 3, md: 5 }, borderRadius: 4, 
-                bgcolor: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(20px)', mb: 6,
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+            <Fade in timeout={800}>
+              <Paper elevation={0} sx={{ 
+                p: { xs: 4, md: 6 }, 
+                borderRadius: 6, 
+                background: blacklistResult?.isSafe && result?.safe 
+                  ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%)'
+                  : 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(245, 158, 11, 0.15) 100%)',
+                border: blacklistResult?.isSafe && result?.safe
+                  ? '2px solid rgba(16, 185, 129, 0.3)'
+                  : '2px solid rgba(239, 68, 68, 0.3)',
+                backdropFilter: 'blur(30px)', 
+                mb: 6,
+                boxShadow: blacklistResult?.isSafe && result?.safe
+                  ? '0 20px 60px -10px rgba(16, 185, 129, 0.4)'
+                  : '0 20px 60px -10px rgba(239, 68, 68, 0.4)',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: blacklistResult?.isSafe && result?.safe
+                    ? 'linear-gradient(90deg, #10b981, #06b6d4, #10b981)'
+                    : 'linear-gradient(90deg, #ef4444, #f59e0b, #ef4444)',
+                  backgroundSize: '200% 100%',
+                  animation: 'gradient 3s ease infinite'
+                },
+                '@keyframes gradient': {
+                  '0%, 100%': { backgroundPosition: '0% 50%' },
+                  '50%': { backgroundPosition: '100% 50%' }
+                }
               }}>
-                <Box sx={{ textAlign: 'center', mb: 4 }}>
+                <Box sx={{ textAlign: 'center', mb: 5 }}>
                    {blacklistResult?.isSafe && result?.safe ? (
-                     <CheckCircleIcon sx={{ fontSize: 80, color: '#10b981', mb: 2, filter: 'drop-shadow(0 0 10px rgba(16,185,129,0.5))' }} />
+                     <>
+                       <Box sx={{ 
+                         display: 'inline-flex',
+                         p: 3,
+                         borderRadius: '50%',
+                         bgcolor: 'rgba(16, 185, 129, 0.2)',
+                         mb: 3,
+                         animation: 'pulse 2s ease-in-out infinite',
+                         '@keyframes pulse': {
+                           '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                           '50%': { transform: 'scale(1.05)', opacity: 0.8 }
+                         }
+                       }}>
+                         <CheckCircleIcon sx={{ 
+                           fontSize: 72, 
+                           color: '#10b981', 
+                           filter: 'drop-shadow(0 0 20px rgba(16,185,129,0.6))'
+                         }} />
+                       </Box>
+                       {result?.trusted && (
+                         <Box sx={{ mb: 3 }}>
+                           <Chip 
+                             icon={<ShieldIcon sx={{ fontSize: '1.2rem !important' }} />} 
+                             label="TRANG WEB ĐÁNG TIN CẬY" 
+                             sx={{ 
+                               background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                               color: '#fff', 
+                               fontWeight: 800,
+                               fontSize: '1rem',
+                               px: 3,
+                               py: 3,
+                               height: 'auto',
+                               borderRadius: 3,
+                               boxShadow: '0 8px 20px -4px rgba(16, 185, 129, 0.5)',
+                               border: '2px solid rgba(255, 255, 255, 0.2)',
+                               '& .MuiChip-icon': {
+                                 color: '#fff'
+                               }
+                             }} 
+                           />
+                         </Box>
+                       )}
+                     </>
                    ) : (
-                     <WarningIcon sx={{ fontSize: 80, color: '#ef4444', mb: 2, filter: 'drop-shadow(0 0 10px rgba(239,68,68,0.5))' }} />
+                     <Box sx={{ 
+                       display: 'inline-flex',
+                       p: 3,
+                       borderRadius: '50%',
+                       bgcolor: 'rgba(239, 68, 68, 0.2)',
+                       mb: 3,
+                       animation: 'shake 0.5s ease-in-out',
+                       '@keyframes shake': {
+                         '0%, 100%': { transform: 'translateX(0)' },
+                         '25%': { transform: 'translateX(-10px)' },
+                         '75%': { transform: 'translateX(10px)' }
+                       }
+                     }}>
+                       <WarningIcon sx={{ 
+                         fontSize: 72, 
+                         color: '#ef4444', 
+                         filter: 'drop-shadow(0 0 20px rgba(239,68,68,0.6))'
+                       }} />
+                     </Box>
                    )}
-                   <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, letterSpacing: -0.5 }}>
+                   <Typography variant="h3" sx={{ 
+                     fontWeight: 900, 
+                     mb: 2, 
+                     letterSpacing: -1,
+                     background: blacklistResult?.isSafe && result?.safe
+                       ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)'
+                       : 'linear-gradient(135deg, #ef4444 0%, #f59e0b 100%)',
+                     WebkitBackgroundClip: 'text',
+                     WebkitTextFillColor: 'transparent',
+                     textShadow: 'none'
+                   }}>
                       {blacklistResult?.isSafe && result?.safe ? 'AN TOÀN TUYỆT ĐỐI' : 'PHÁT HIỆN NGUY HIỂM!'}
                    </Typography>
-                   <Typography variant="body1" sx={{ color: '#94a3b8' }}>
+                   <Typography variant="h6" sx={{ 
+                     color: '#cbd5e1',
+                     fontWeight: 500,
+                     maxWidth: '600px',
+                     mx: 'auto',
+                     lineHeight: 1.6
+                   }}>
                       {blacklistResult?.message || result?.message}
                    </Typography>
                 </Box>
                 
                 <Grid container spacing={3}>
                    <Grid item xs={12} md={6}>
-                      <Box sx={{ p: 3, borderRadius: 3, bgcolor: 'rgba(15, 23, 42, 0.6)', height: '100%', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <Typography variant="overline" sx={{ color: '#06b6d4', fontWeight: 700, letterSpacing: 1 }}>CƠ SỞ DỮ LIỆU</Typography>
-                        <Divider sx={{ my: 1, bgcolor: 'rgba(255,255,255,0.1)' }} />
-                        <Typography variant="h6" color={blacklistResult?.isSafe ? '#10b981' : '#ef4444'} sx={{ fontWeight: 700 }}>
-                           {blacklistResult?.isSafe ? 'Sạch (Clean)' : 'Nằm trong danh sách đen!'}
-                        </Typography>
-                        {!blacklistResult?.isSafe && (
-                           <Box sx={{ mt: 2 }}>
-                             <Chip label={`Loại: ${blacklistResult?.data?.scamType || 'N/A'}`} color="error" variant="outlined" sx={{ mr: 1 }} />
-                             <Typography variant="caption" display="block" sx={{ mt: 1, color: '#94a3b8' }}>
-                               Ngày: {formatDate(blacklistResult?.data?.addedDate)}
-                             </Typography>
-                           </Box>
-                        )}
-                      </Box>
+                      <Card elevation={0} sx={{ 
+                        height: '100%',
+                        background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)',
+                        backdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                          boxShadow: '0 12px 30px -8px rgba(6, 182, 212, 0.3)',
+                          borderColor: 'rgba(6, 182, 212, 0.4)'
+                        }
+                      }}>
+                        <CardContent sx={{ p: 4 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                            <Box sx={{
+                              p: 1.5,
+                              borderRadius: 2,
+                              background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}>
+                              <ShieldIcon sx={{ color: '#fff', fontSize: 28 }} />
+                            </Box>
+                            <Typography variant="h6" sx={{ 
+                              color: '#06b6d4', 
+                              fontWeight: 800, 
+                              letterSpacing: 0.5,
+                              textTransform: 'uppercase'
+                            }}>
+                              Cơ sở dữ liệu
+                            </Typography>
+                          </Box>
+                          
+                          <Box sx={{ 
+                            p: 3, 
+                            borderRadius: 3,
+                            bgcolor: blacklistResult?.isSafe ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                            border: `2px solid ${blacklistResult?.isSafe ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                            textAlign: 'center'
+                          }}>
+                            <Typography variant="h4" sx={{ 
+                              fontWeight: 900,
+                              color: blacklistResult?.isSafe ? '#10b981' : '#ef4444',
+                              mb: 1,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: 1
+                            }}>
+                              {blacklistResult?.isSafe ? (
+                                <><CheckCircleIcon sx={{ fontSize: 32 }} /> Sạch</>
+                              ) : (
+                                <><ErrorIcon sx={{ fontSize: 32 }} /> Nguy hiểm!</>
+                              )}
+                            </Typography>
+                            {!blacklistResult?.isSafe && blacklistResult?.data && (
+                               <Box sx={{ mt: 2 }}>
+                                 <Chip 
+                                   label={`${blacklistResult?.data?.scamType || 'N/A'}`} 
+                                   color="error" 
+                                   sx={{ 
+                                     fontWeight: 700,
+                                     fontSize: '0.85rem',
+                                     mb: 1
+                                   }} 
+                                 />
+                                 <Typography variant="caption" display="block" sx={{ color: '#94a3b8' }}>
+                                   Phát hiện: {formatDate(blacklistResult?.data?.addedDate)}
+                                 </Typography>
+                               </Box>
+                            )}
+                          </Box>
+                        </CardContent>
+                      </Card>
                    </Grid>
+                   
                    <Grid item xs={12} md={6}>
-                      <Box sx={{ p: 3, borderRadius: 3, bgcolor: 'rgba(15, 23, 42, 0.6)', height: '100%', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <Typography variant="overline" sx={{ color: '#06b6d4', fontWeight: 700, letterSpacing: 1 }}>PHÂN TÍCH AI (VIRUSTOTAL)</Typography>
-                        <Divider sx={{ my: 1, bgcolor: 'rgba(255,255,255,0.1)' }} />
-                        <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                           <Grid item xs={6}>
-                              <Typography variant="body2" sx={{ color: '#94a3b8' }}>Độc hại</Typography>
-                              <Typography variant="h5" color="#ef4444" fontWeight="800">{result?.analysis?.malicious || 0}</Typography>
-                           </Grid>
-                           <Grid item xs={6}>
-                              <Typography variant="body2" sx={{ color: '#94a3b8' }}>Đáng ngờ</Typography>
-                              <Typography variant="h5" color="#f59e0b" fontWeight="800">{result?.analysis?.suspicious || 0}</Typography>
-                           </Grid>
-                        </Grid>
-                      </Box>
+                      <Card elevation={0} sx={{ 
+                        height: '100%',
+                        background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)',
+                        backdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                          boxShadow: '0 12px 30px -8px rgba(139, 92, 246, 0.3)',
+                          borderColor: 'rgba(139, 92, 246, 0.4)'
+                        }
+                      }}>
+                        <CardContent sx={{ p: 4 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                            <Box sx={{
+                              p: 1.5,
+                              borderRadius: 2,
+                              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}>
+                              <VisibilityIcon sx={{ color: '#fff', fontSize: 28 }} />
+                            </Box>
+                            <Typography variant="h6" sx={{ 
+                              color: '#8b5cf6', 
+                              fontWeight: 800, 
+                              letterSpacing: 0.5,
+                              textTransform: 'uppercase'
+                            }}>
+                              Phân tích AI
+                            </Typography>
+                          </Box>
+                          
+                          {result?.aiAnalysis?.success ? (
+                            <Box>
+                              {/* AI Trust Score */}
+                              <Box sx={{ 
+                                p: 3, 
+                                borderRadius: 3,
+                                background: `linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%)`,
+                                border: '2px solid rgba(139, 92, 246, 0.3)',
+                                textAlign: 'center',
+                                mb: 2
+                              }}>
+                                <Typography variant="caption" sx={{ color: '#a78bfa', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                                  Điểm tin cậy AI
+                                </Typography>
+                                <Typography variant="h2" sx={{ 
+                                  color: '#8b5cf6', 
+                                  fontWeight: 900,
+                                  my: 1,
+                                  textShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
+                                }}>
+                                  {result.aiAnalysis.trustScore || 0}/100
+                                </Typography>
+                                <Chip 
+                                  label={result.aiAnalysis.riskLevel?.toUpperCase() || 'UNKNOWN'}
+                                  size="small"
+                                  sx={{ 
+                                    bgcolor: result.aiAnalysis.riskLevel === 'safe' ? '#10b981' : 
+                                            result.aiAnalysis.riskLevel === 'low' ? '#3b82f6' :
+                                            result.aiAnalysis.riskLevel === 'medium' ? '#f59e0b' : '#ef4444',
+                                    color: '#fff',
+                                    fontWeight: 700
+                                  }}
+                                />
+                              </Box>
+                              
+                              {/* AI Analysis Text */}
+                              <Box sx={{ 
+                                p: 2.5, 
+                                borderRadius: 3,
+                                bgcolor: 'rgba(139, 92, 246, 0.05)',
+                                border: '1px solid rgba(139, 92, 246, 0.2)'
+                              }}>
+                                <Typography variant="body2" sx={{ color: '#e2e8f0', lineHeight: 1.6 }}>
+                                  {result.aiAnalysis.analysis}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          ) : (
+                            <Grid container spacing={2}>
+                              <Grid item xs={6}>
+                                <Box sx={{ 
+                                  p: 2.5, 
+                                  borderRadius: 3,
+                                  bgcolor: 'rgba(239, 68, 68, 0.1)',
+                                  border: '2px solid rgba(239, 68, 68, 0.2)',
+                                  textAlign: 'center',
+                                  transition: 'all 0.3s',
+                                  '&:hover': {
+                                    borderColor: 'rgba(239, 68, 68, 0.5)',
+                                    transform: 'scale(1.05)'
+                                  }
+                                }}>
+                                  <ErrorIcon sx={{ color: '#ef4444', fontSize: 28, mb: 1 }} />
+                                  <Typography variant="h3" sx={{ 
+                                    color: '#ef4444', 
+                                    fontWeight: 900,
+                                    mb: 0.5,
+                                    textShadow: '0 0 20px rgba(239, 68, 68, 0.3)'
+                                  }}>
+                                    {result?.details?.malicious || result?.analysis?.malicious || 0}
+                                  </Typography>
+                                  <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
+                                    Độc hại
+                                  </Typography>
+                                </Box>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <Box sx={{ 
+                                  p: 2.5, 
+                                  borderRadius: 3,
+                                  bgcolor: 'rgba(245, 158, 11, 0.1)',
+                                  border: '2px solid rgba(245, 158, 11, 0.2)',
+                                  textAlign: 'center',
+                                  transition: 'all 0.3s',
+                                  '&:hover': {
+                                    borderColor: 'rgba(245, 158, 11, 0.5)',
+                                    transform: 'scale(1.05)'
+                                  }
+                                }}>
+                                  <WarningIcon sx={{ color: '#f59e0b', fontSize: 28, mb: 1 }} />
+                                  <Typography variant="h3" sx={{ 
+                                    color: '#f59e0b', 
+                                    fontWeight: 900,
+                                    mb: 0.5,
+                                    textShadow: '0 0 20px rgba(245, 158, 11, 0.3)'
+                                  }}>
+                                    {result?.details?.suspicious || result?.analysis?.suspicious || 0}
+                                  </Typography>
+                                  <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
+                                    Đáng ngờ
+                                  </Typography>
+                                </Box>
+                              </Grid>
+                            </Grid>
+                          )}
+                        </CardContent>
+                      </Card>
                    </Grid>
                 </Grid>
               </Paper>
-            </Grow>
+            </Fade>
           )}
         </Box>
       </Container>

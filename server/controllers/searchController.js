@@ -1,5 +1,5 @@
 const Blacklist = require('../models/Blacklist');
-const { normalizeUrl, isValidUrl } = require('../utils/urlNormalizer');
+const { normalizeUrl, isValidUrl, isTrustedDomain } = require('../utils/urlNormalizer');
 
 exports.searchUrl = async (req, res) => {
   try {
@@ -16,6 +16,16 @@ exports.searchUrl = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'URL không hợp lệ',
+      });
+    }
+
+    // Check if it's a trusted domain first
+    if (isTrustedDomain(url)) {
+      return res.status(200).json({
+        success: true,
+        isSafe: true,
+        message: 'URL an toàn - Đây là trang web đáng tin cậy',
+        data: null,
       });
     }
 
@@ -94,6 +104,16 @@ exports.bulkSearchUrls = async (req, res) => {
     });
 
     const results = normalizedUrls.map(({ original, normalized }) => {
+      // Check if trusted domain
+      if (isTrustedDomain(original)) {
+        return {
+          url: original,
+          isSafe: true,
+          scamType: null,
+          dangerLevel: null,
+        };
+      }
+      
       const scam = scamMap.get(normalized);
       return {
         url: original,

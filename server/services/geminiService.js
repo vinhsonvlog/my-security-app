@@ -107,9 +107,78 @@ Trả lời CHÍNH XÁC theo định dạng JSON sau, KHÔNG thêm bất kỳ te
     throw new Error('Không thể tạo câu hỏi từ Gemini API');
   }
 };
+/**
+ * Analyze URL safety using Gemini AI
+ * @param {string} url - URL to analyze
+ * @param {Object} virusTotalData - VirusTotal scan results
+ * @param {Object} blacklistData - Blacklist check results
+ * @returns {Object} AI analysis result
+ */
+const analyzeUrlWithAI = async (url, virusTotalData = null, blacklistData = null) => {
+  if (!GEMINI_API_KEY) {
+    return {
+      success: false,
+      analysis: 'Gemini AI chưa được cấu hình',
+      riskLevel: 'unknown',
+      recommendations: []
+    };
+  }
+
+  try {
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+
+    const prompt = `
+Bạn là chuyên gia an ninh mạng. Hãy phân tích URL sau và đánh giá mức độ nguy hiểm:
+
+URL: ${url}
+
+Dữ liệu từ VirusTotal: ${virusTotalData ? JSON.stringify(virusTotalData.details) : 'Không có'}
+Dữ liệu Blacklist: ${blacklistData ? (blacklistData.isSafe ? 'An toàn' : `Nguy hiểm - ${blacklistData.data?.scamType}`) : 'Không có'}
+
+Hãy phân tích:
+1. Cấu trúc URL (domain, subdomain, path, parameters)
+2. Dấu hiệu đáng ngờ (ký tự lạ, domain giả mạo, rút gọn...)
+3. Mức độ rủi ro tổng thể
+4. Khuyến nghị cụ thể
+
+Trả về CHÍNH XÁC theo format JSON (không thêm text nào khác):
+
+{
+  "analysis": "Phân tích chi tiết về URL này (2-3 câu ngắn gọn)",
+  "riskLevel": "safe/low/medium/high/critical",
+  "suspiciousIndicators": ["dấu hiệu 1", "dấu hiệu 2"],
+  "recommendations": ["khuyến nghị 1", "khuyến nghị 2"],
+  "trustScore": 85
+}
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+
+    const cleanedText = text.replace(/```json|```/g, '').trim();
+    const parsedData = JSON.parse(cleanedText);
+
+    return {
+      success: true,
+      ...parsedData
+    };
+
+  } catch (error) {
+    console.error('Gemini AI Analysis Error:', error.message);
+    return {
+      success: false,
+      analysis: 'Không thể phân tích với AI lúc này',
+      riskLevel: 'unknown',
+      recommendations: ['Hãy cẩn thận khi truy cập URL này']
+    };
+  }
+};
 
 module.exports = {
   generateQuizQuestion,
+  analyzeUrlWithAI,
   QUESTION_TYPES,
   DIFFICULTY_LEVELS
 };

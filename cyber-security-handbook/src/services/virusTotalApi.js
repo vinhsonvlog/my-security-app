@@ -22,11 +22,23 @@ export const checkUrlSafety = async (urlToCheck) => {
 
     const data = result.data
 
+    if (result.source === 'trusted') {
+      return {
+        safe: true,
+        trusted: true,
+        message: data.message,
+        details: data.details || { malicious: 0, suspicious: 0, harmless: 0 },
+        analysis: data.details || { malicious: 0, suspicious: 0 },
+        aiAnalysis: data.aiAnalysis || null
+      }
+    }
+
     if (result.source === 'blacklist') {
       return {
         safe: false,
         message: data.message,
-        details: `Lý do: ${data.details.reason} | Mức độ: ${data.details.severity} | Đã bị chặn: ${new Date(data.details.approvedAt).toLocaleDateString('vi-VN')}`
+        details: `Lý do: ${data.details.reason} | Mức độ: ${data.details.severity} | Đã bị chặn: ${new Date(data.details.approvedAt).toLocaleDateString('vi-VN')}`,
+        aiAnalysis: data.aiAnalysis || null
       }
     }
 
@@ -35,7 +47,8 @@ export const checkUrlSafety = async (urlToCheck) => {
         return {
           safe: null,
           message: data.message,
-          details: data.details.info || data.details.error || 'Chưa có thông tin về URL này'
+          details: data.details.info || data.details.error || 'Chưa có thông tin về URL này',
+          aiAnalysis: data.aiAnalysis || null
         }
       }
 
@@ -44,14 +57,21 @@ export const checkUrlSafety = async (urlToCheck) => {
         return {
           safe: data.safe,
           message: data.message,
-          details: `Độc hại: ${data.details.malicious} | Nghi ngờ: ${data.details.suspicious} | Sạch: ${data.details.harmless} | Tỷ lệ nguy hiểm: ${data.details.percentage}%`
+          details: data.details,
+          analysis: {
+            malicious: data.details.malicious,
+            suspicious: data.details.suspicious,
+            harmless: data.details.harmless
+          },
+          aiAnalysis: data.aiAnalysis || null
         }
       }
 
       return {
         safe: data.safe,
         message: data.message,
-        details: typeof data.details === 'string' ? data.details : JSON.stringify(data.details)
+        details: typeof data.details === 'string' ? data.details : JSON.stringify(data.details),
+        aiAnalysis: data.aiAnalysis || null
       }
     }
 
