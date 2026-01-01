@@ -34,6 +34,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
 }));
 
+app.use(cors({
+  origin: 'https://my-security-app-six.vercel.app/' // Link Vercel cấp cho bạn
+}));
 // Tăng giới hạn payload size cho việc upload hình ảnh base64
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
