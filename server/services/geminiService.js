@@ -50,7 +50,7 @@ const generateQuizQuestion = async (type = null, difficulty = 'cơ bản') => {
     const topic = typeData.topics[Math.floor(Math.random() * typeData.topics.length)];
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
     const prompt = `
 Bạn là chuyên gia an ninh mạng.
@@ -115,66 +115,63 @@ Trả lời CHÍNH XÁC theo định dạng JSON sau, KHÔNG thêm bất kỳ te
  * @returns {Object} AI analysis result
  */
 const analyzeUrlWithAI = async (url, virusTotalData = null, blacklistData = null) => {
-  if (!GEMINI_API_KEY) {
-    return {
-      success: false,
-      analysis: 'Gemini AI chưa được cấu hình',
-      riskLevel: 'unknown',
-      recommendations: []
-    };
-  }
+  // DISABLED: Gemini AI has quota/compatibility issues
+  // Using heuristic fallback analysis instead (faster, more reliable, no API costs)
+  console.log('📊 Using heuristic analysis (AI disabled)');
+  return provideFallbackAnalysis(virusTotalData, blacklistData);
+};
 
-  try {
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-
-    const prompt = `
-Bạn là chuyên gia an ninh mạng. Hãy phân tích URL sau và đánh giá mức độ nguy hiểm:
-
-URL: ${url}
-
-Dữ liệu từ VirusTotal: ${virusTotalData ? JSON.stringify(virusTotalData.details) : 'Không có'}
-Dữ liệu Blacklist: ${blacklistData ? (blacklistData.isSafe ? 'An toàn' : `Nguy hiểm - ${blacklistData.data?.scamType}`) : 'Không có'}
-
-Hãy phân tích:
-1. Cấu trúc URL (domain, subdomain, path, parameters)
-2. Dấu hiệu đáng ngờ (ký tự lạ, domain giả mạo, rút gọn...)
-3. Mức độ rủi ro tổng thể
-4. Khuyến nghị cụ thể
-
-Trả về CHÍNH XÁC theo format JSON (không thêm text nào khác):
-
-{
-  "analysis": "Phân tích chi tiết về URL này (2-3 câu ngắn gọn)",
-  "riskLevel": "safe/low/medium/high/critical",
-  "suspiciousIndicators": ["dấu hiệu 1", "dấu hiệu 2"],
-  "recommendations": ["khuyến nghị 1", "khuyến nghị 2"],
-  "trustScore": 85
-}
-`;
-
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-
-    const cleanedText = text.replace(/```json|```/g, '').trim();
-    const parsedData = JSON.parse(cleanedText);
-
+/**
+ * Provide fallback analysis when AI is unavailable
+ */
+function provideFallbackAnalysis(virusTotalData, blacklistData) {
+  // Provide smart fallback based on VirusTotal data
+  if (virusTotalData && virusTotalData.details) {
+    const malicious = (virusTotalData.details.malicious || 0) + (virusTotalData.details.suspicious || 0);
+    const total = virusTotalData.details.total || 1;
+    const percentage = Math.round((malicious / total) * 100);
+    
+    let riskLevel = 'low';
+    let trustScore = 80;
+    let analysis = 'Phân tích dựa trên dữ liệu VirusTotal: ';
+    
+    if (malicious === 0) {
+      riskLevel = 'safe';
+      trustScore = 95;
+      analysis += 'Không phát hiện mối đe dọa từ các công cụ bảo mật.';
+    } else if (percentage < 10) {
+      riskLevel = 'low';
+      trustScore = 70;
+      analysis += `Phát hiện ${malicious} cảnh báo nhỏ, nên cẩn thận.`;
+    } else if (percentage < 30) {
+      riskLevel = 'medium';
+      trustScore = 50;
+      analysis += `Có ${malicious} cảnh báo nguy hiểm từ các công cụ bảo mật.`;
+    } else {
+      riskLevel = 'high';
+      trustScore = 20;
+      analysis += `NGUY HIỂM! ${malicious} công cụ bảo mật đã cảnh báo URL này.`;
+    }
+    
     return {
       success: true,
-      ...parsedData
-    };
-
-  } catch (error) {
-    console.error('Gemini AI Analysis Error:', error.message);
-    return {
-      success: false,
-      analysis: 'Không thể phân tích với AI lúc này',
-      riskLevel: 'unknown',
-      recommendations: ['Hãy cẩn thận khi truy cập URL này']
+      analysis: analysis,
+      riskLevel: riskLevel,
+      trustScore: trustScore,
+      suspiciousIndicators: malicious > 0 ? [`${malicious} cảnh báo từ antivirus engines`] : [],
+      recommendations: malicious > 0 ? ['Không nên truy cập', 'Kiểm tra nguồn gốc URL'] : ['URL có vẻ an toàn']
     };
   }
-};
+  
+  // Default fallback if no VirusTotal data
+  return {
+    success: true,
+    analysis: 'Chưa có đủ dữ liệu để phân tích. Hãy dựa vào kết quả VirusTotal và cơ sở dữ liệu.',
+    riskLevel: 'unknown',
+    trustScore: 50,
+    recommendations: ['Hãy cẩn thận khi truy cập URL này', 'Kiểm tra nguồn gốc URL']
+  };
+}
 
 module.exports = {
   generateQuizQuestion,

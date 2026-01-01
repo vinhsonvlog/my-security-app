@@ -598,14 +598,23 @@ const UrlChecker = () => {
                             }}>
                               <VisibilityIcon sx={{ color: '#fff', fontSize: 28 }} />
                             </Box>
-                            <Typography variant="h6" sx={{ 
-                              color: '#8b5cf6', 
-                              fontWeight: 800, 
-                              letterSpacing: 0.5,
-                              textTransform: 'uppercase'
-                            }}>
-                              Phân tích AI
-                            </Typography>
+                            <Box>
+                              <Typography variant="h6" sx={{ 
+                                color: '#8b5cf6', 
+                                fontWeight: 800, 
+                                letterSpacing: 0.5,
+                                textTransform: 'uppercase'
+                              }}>
+                                Phân tích bảo mật
+                              </Typography>
+                              <Typography variant="caption" sx={{ 
+                                color: '#a78bfa', 
+                                fontSize: '0.75rem',
+                                display: 'block'
+                              }}>
+                                Dựa trên VirusTotal & Blacklist Database
+                              </Typography>
+                            </Box>
                           </Box>
                           
                           {result?.aiAnalysis?.success ? (
@@ -620,7 +629,7 @@ const UrlChecker = () => {
                                 mb: 2
                               }}>
                                 <Typography variant="caption" sx={{ color: '#a78bfa', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-                                  Điểm tin cậy AI
+                                  Điểm tin cậy
                                 </Typography>
                                 <Typography variant="h2" sx={{ 
                                   color: '#8b5cf6', 
