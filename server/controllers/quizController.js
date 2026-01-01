@@ -41,10 +41,12 @@ const generateQuestion = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error generating question:', error);
+    console.error('❌ Error generating question:', error);
+    console.error('Stack trace:', error.stack);
     res.status(500).json({
       success: false,
-      message: error.message || 'Lỗi khi tạo câu hỏi'
+      message: error.message || 'Có lỗi khi tạo câu hỏi, vui lòng thử lại sau!',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

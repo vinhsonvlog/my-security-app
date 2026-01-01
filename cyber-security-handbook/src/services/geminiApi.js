@@ -18,7 +18,16 @@ export const generateCyberQuestion = async (type = null, difficulty = 'cơ bản
 
   } catch (error) {
     console.error('Error calling backend API:', error)
-    return null
+    if (error.response) {
+      console.error('Response error:', error.response.data)
+      throw new Error(error.response.data?.message || 'Có lỗi khi gọi AI, vui lòng thử lại sau!')
+    } else if (error.request) {
+      console.error('No response from server')
+      throw new Error('Không thể kết nối đến server, vui lòng kiểm tra kết nối!')
+    } else {
+      console.error('Request setup error:', error.message)
+      throw new Error('Có lỗi xảy ra, vui lòng thử lại sau!')
+    }
   }
 }
 

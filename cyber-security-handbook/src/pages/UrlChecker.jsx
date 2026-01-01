@@ -367,15 +367,15 @@ const UrlChecker = () => {
               <Paper elevation={0} sx={{ 
                 p: { xs: 4, md: 6 }, 
                 borderRadius: 6, 
-                background: blacklistResult?.isSafe && result?.safe 
+                background: ((blacklistResult?.isSafe !== false && result?.safe) || (blacklistResult?.isSafe && !result))
                   ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%)'
                   : 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(245, 158, 11, 0.15) 100%)',
-                border: blacklistResult?.isSafe && result?.safe
+                border: ((blacklistResult?.isSafe !== false && result?.safe) || (blacklistResult?.isSafe && !result))
                   ? '2px solid rgba(16, 185, 129, 0.3)'
                   : '2px solid rgba(239, 68, 68, 0.3)',
                 backdropFilter: 'blur(30px)', 
                 mb: 6,
-                boxShadow: blacklistResult?.isSafe && result?.safe
+                boxShadow: ((blacklistResult?.isSafe !== false && result?.safe) || (blacklistResult?.isSafe && !result))
                   ? '0 20px 60px -10px rgba(16, 185, 129, 0.4)'
                   : '0 20px 60px -10px rgba(239, 68, 68, 0.4)',
                 position: 'relative',
@@ -387,7 +387,7 @@ const UrlChecker = () => {
                   left: 0,
                   right: 0,
                   height: '4px',
-                  background: blacklistResult?.isSafe && result?.safe
+                  background: ((blacklistResult?.isSafe !== false && result?.safe) || (blacklistResult?.isSafe && !result))
                     ? 'linear-gradient(90deg, #10b981, #06b6d4, #10b981)'
                     : 'linear-gradient(90deg, #ef4444, #f59e0b, #ef4444)',
                   backgroundSize: '200% 100%',
@@ -399,7 +399,7 @@ const UrlChecker = () => {
                 }
               }}>
                 <Box sx={{ textAlign: 'center', mb: 5 }}>
-                   {blacklistResult?.isSafe && result?.safe ? (
+                   {((blacklistResult?.isSafe !== false && result?.safe) || (blacklistResult?.isSafe && !result)) ? (
                      <>
                        <Box sx={{ 
                          display: 'inline-flex',
@@ -468,14 +468,20 @@ const UrlChecker = () => {
                      fontWeight: 900, 
                      mb: 2, 
                      letterSpacing: -1,
-                     background: blacklistResult?.isSafe && result?.safe
+                     background: ((blacklistResult?.isSafe !== false && result?.safe) || (blacklistResult?.isSafe && !result))
                        ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)'
-                       : 'linear-gradient(135deg, #ef4444 0%, #f59e0b 100%)',
+                       : result?.aiAnalysis?.riskLevel === 'high' 
+                         ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                         : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                      WebkitBackgroundClip: 'text',
                      WebkitTextFillColor: 'transparent',
                      textShadow: 'none'
                    }}>
-                      {blacklistResult?.isSafe && result?.safe ? 'AN TOÀN TUYỆT ĐỐI' : 'PHÁT HIỆN NGUY HIỂM!'}
+                      {(blacklistResult?.isSafe !== false && result?.safe) || (blacklistResult?.isSafe && !result) 
+                        ? 'AN TOÀN TUYỆT ĐỐI' 
+                        : result?.aiAnalysis?.riskLevel === 'high' 
+                          ? 'PHÁT HIỆN NGUY HIỂM!' 
+                          : 'CẢNH BÁO!'}
                    </Typography>
                    <Typography variant="h6" sx={{ 
                      color: '#cbd5e1',
@@ -598,69 +604,100 @@ const UrlChecker = () => {
                             }}>
                               <VisibilityIcon sx={{ color: '#fff', fontSize: 28 }} />
                             </Box>
-                            <Box>
-                              <Typography variant="h6" sx={{ 
-                                color: '#8b5cf6', 
-                                fontWeight: 800, 
-                                letterSpacing: 0.5,
-                                textTransform: 'uppercase'
-                              }}>
-                                Phân tích bảo mật
-                              </Typography>
+                            <Box sx={{ flex: 1 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                <Typography variant="h6" sx={{ 
+                                  color: '#8b5cf6', 
+                                  fontWeight: 800, 
+                                  letterSpacing: 0.5,
+                                  textTransform: 'uppercase'
+                                }}>
+                                  Phân tích bảo mật
+                                </Typography>
+                                {result?.aiAnalysis?.aiPowered && (
+                                  <Chip 
+                                    label="🤖 AI" 
+                                    size="small"
+                                    sx={{ 
+                                      bgcolor: 'rgba(139, 92, 246, 0.2)',
+                                      color: '#a78bfa',
+                                      fontWeight: 700,
+                                      fontSize: '0.7rem',
+                                      height: '20px',
+                                      border: '1px solid rgba(139, 92, 246, 0.4)',
+                                      animation: 'pulse 2s ease-in-out infinite',
+                                      '@keyframes pulse': {
+                                        '0%, 100%': { opacity: 1 },
+                                        '50%': { opacity: 0.7 }
+                                      }
+                                    }}
+                                  />
+                                )}
+                              </Box>
                               <Typography variant="caption" sx={{ 
                                 color: '#a78bfa', 
                                 fontSize: '0.75rem',
                                 display: 'block'
                               }}>
-                                Dựa trên VirusTotal & Blacklist Database
+                                {result?.aiAnalysis?.aiPowered 
+                                  ? 'Phân tích bởi Gemini AI & VirusTotal'
+                                  : 'Dựa trên VirusTotal & Blacklist Database'
+                                }
                               </Typography>
                             </Box>
                           </Box>
                           
                           {result?.aiAnalysis?.success ? (
                             <Box>
-                              {/* AI Trust Score */}
+                              {/* AI Analysis Text - Main Display */}
                               <Box sx={{ 
                                 p: 3, 
                                 borderRadius: 3,
                                 background: `linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%)`,
                                 border: '2px solid rgba(139, 92, 246, 0.3)',
-                                textAlign: 'center',
                                 mb: 2
                               }}>
-                                <Typography variant="caption" sx={{ color: '#a78bfa', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-                                  Điểm tin cậy
-                                </Typography>
-                                <Typography variant="h2" sx={{ 
-                                  color: '#8b5cf6', 
-                                  fontWeight: 900,
-                                  my: 1,
-                                  textShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                                  <Typography variant="caption" sx={{ color: '#a78bfa', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                                    Phân tích chi tiết
+                                  </Typography>
+                                  <Chip 
+                                    label={result.aiAnalysis.riskLevel?.toUpperCase() || 'UNKNOWN'}
+                                    size="small"
+                                    sx={{ 
+                                      bgcolor: result.aiAnalysis.riskLevel === 'safe' ? '#10b981' : 
+                                              result.aiAnalysis.riskLevel === 'low' ? '#3b82f6' :
+                                              result.aiAnalysis.riskLevel === 'medium' ? '#f59e0b' : '#ef4444',
+                                      color: '#fff',
+                                      fontWeight: 700
+                                    }}
+                                  />
+                                </Box>
+                                <Typography variant="body1" sx={{ 
+                                  color: '#e2e8f0', 
+                                  lineHeight: 1.8,
+                                  fontSize: '0.95rem'
                                 }}>
-                                  {result.aiAnalysis.trustScore || 0}/100
+                                  {result.aiAnalysis.analysis}
                                 </Typography>
-                                <Chip 
-                                  label={result.aiAnalysis.riskLevel?.toUpperCase() || 'UNKNOWN'}
-                                  size="small"
-                                  sx={{ 
-                                    bgcolor: result.aiAnalysis.riskLevel === 'safe' ? '#10b981' : 
-                                            result.aiAnalysis.riskLevel === 'low' ? '#3b82f6' :
-                                            result.aiAnalysis.riskLevel === 'medium' ? '#f59e0b' : '#ef4444',
-                                    color: '#fff',
-                                    fontWeight: 700
-                                  }}
-                                />
                               </Box>
                               
-                              {/* AI Analysis Text */}
+                              {/* Trust Score - Secondary */}
                               <Box sx={{ 
-                                p: 2.5, 
+                                p: 2, 
                                 borderRadius: 3,
                                 bgcolor: 'rgba(139, 92, 246, 0.05)',
-                                border: '1px solid rgba(139, 92, 246, 0.2)'
+                                border: '1px solid rgba(139, 92, 246, 0.2)',
+                                textAlign: 'center'
                               }}>
-                                <Typography variant="body2" sx={{ color: '#e2e8f0', lineHeight: 1.6 }}>
-                                  {result.aiAnalysis.analysis}
+                                <Typography variant="caption" sx={{ color: '#94a3b8', display: 'block', mb: 0.5 }}>
+                                  Điểm tin cậy
+                                </Typography>
+                                <Typography variant="h4" sx={{ 
+                                  color: '#8b5cf6', 
+                                  fontWeight: 800
+                                }}>
+                                  {result.aiAnalysis.trustScore || 0}/100
                                 </Typography>
                               </Box>
                             </Box>

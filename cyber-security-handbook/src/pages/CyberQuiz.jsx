@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Container, Typography, Button, Card, CardContent, Chip, Box, Radio, RadioGroup, FormControlLabel, FormControl, Alert } from '@mui/material'
+import { Container, Typography, Button, Card, CardContent, Chip, Box, Radio, RadioGroup, FormControlLabel, FormControl, Alert, Snackbar } from '@mui/material'
 import SmartToyIcon from '@mui/icons-material/SmartToy'
 import { generateCyberQuestion } from '../services/geminiApi'
 
@@ -8,21 +8,33 @@ const CyberQuiz = () => {
   const [loading, setLoading] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState('')
   const [showResult, setShowResult] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [showError, setShowError] = useState(false)
 
   const handleGenerateQuestion = async () => {
     setLoading(true)
     setSelectedAnswer('')
     setShowResult(false)
     setQuestion(null)
+    setErrorMessage('')
+    setShowError(false)
 
-    const result = await generateCyberQuestion()
+    try {
+      const result = await generateCyberQuestion()
 
-    if (result) {
-      setQuestion(result)
-    } else {
-      alert('Có lỗi khi gọi AI, vui lòng thử lại sau!')
+      if (result) {
+        setQuestion(result)
+      } else {
+        setErrorMessage('Không thể tạo câu hỏi, vui lòng thử lại sau!')
+        setShowError(true)
+      }
+    } catch (error) {
+      console.error('Error generating question:', error)
+      setErrorMessage(error.message || 'Có lỗi xảy ra, vui lòng thử lại sau!')
+      setShowError(true)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const handleAnswerChange = (event) => {
@@ -178,6 +190,21 @@ const CyberQuiz = () => {
             </CardContent>
           </Card>
         )}
+        
+        <Snackbar 
+          open={showError} 
+          autoHideDuration={6000} 
+          onClose={() => setShowError(false)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert 
+            onClose={() => setShowError(false)} 
+            severity="error" 
+            sx={{ width: '100%', fontSize: '1rem', fontWeight: 600 }}
+          >
+            {errorMessage}
+          </Alert>
+        </Snackbar>
       </Container>
     </Box>
   )
