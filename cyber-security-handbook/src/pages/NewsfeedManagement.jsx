@@ -68,16 +68,16 @@ const NewsfeedManagement = () => {
     setLoading(true)
     setError('')
     try {
-      const result = await getAllBlacklist({ page, limit: 10 })
+      const result = await getAllBlacklist({ page, limit: 20 })
       console.log('getAllBlacklist result:', result)
       
       if (result.success) {
-        // API có thể trả về result.data.items hoặc result.items
-        const itemsData = result.data?.items || result.items || []
-        const totalPagesData = result.data?.totalPages || result.totalPages || 1
+        // Backend trả về result.data (array) và result.pagination
+        const itemsData = result.data || []
+        const paginationData = result.pagination || {}
         
         setItems(Array.isArray(itemsData) ? itemsData : [])
-        setTotalPages(totalPagesData)
+        setTotalPages(paginationData.totalPages || 1)
       } else {
         setItems([])
         setError(result.message || 'Không thể tải dữ liệu')
@@ -142,6 +142,8 @@ const NewsfeedManagement = () => {
         setSuccess(editingItem ? 'Cập nhật thành công!' : 'Thêm bài viết thành công!')
         handleCloseDialog()
         loadItems()
+      } else {
+        setError(result.message || 'Có lỗi xảy ra')
       }
     } catch (err) {
       setError(err.message || 'Có lỗi xảy ra')
@@ -159,6 +161,8 @@ const NewsfeedManagement = () => {
       if (result.success) {
         setSuccess('Xóa thành công!')
         loadItems()
+      } else {
+        setError(result.message || 'Không thể xóa')
       }
     } catch (err) {
       setError(err.message || 'Không thể xóa')
@@ -175,6 +179,17 @@ const NewsfeedManagement = () => {
   const getScamLabel = (type) => {
     const found = scamTypes.find(s => s.value === type)
     return found ? found.label : type
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('vi-VN', { 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
   return (
@@ -248,6 +263,7 @@ const NewsfeedManagement = () => {
                         <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }}>Loại lừa đảo</TableCell>
                         <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }}>Mức độ</TableCell>
                         <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }}>Mô tả</TableCell>
+                        <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }}>Ngày tạo</TableCell>
                         <TableCell sx={{ color: '#94a3b8', fontWeight: 700 }} align="right">Thao tác</TableCell>
                       </TableRow>
                     </TableHead>
@@ -277,6 +293,9 @@ const NewsfeedManagement = () => {
                           </TableCell>
                           <TableCell sx={{ color: '#94a3b8', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {item.description || 'Không có mô tả'}
+                          </TableCell>
+                          <TableCell sx={{ color: '#94a3b8' }}>
+                            {formatDate(item.createdAt)}
                           </TableCell>
                           <TableCell align="right">
                             <IconButton 
